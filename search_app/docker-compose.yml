@@ -1,0 +1,39 @@
+version: '3.11'
+
+services:
+
+  db_search:
+    image: postgres
+    container_name: db_search
+    networks:
+      - search-api
+    environment:
+      - POSTGRES_DB=userdatabase
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+    restart: always
+
+  app_search:
+    build: .
+    container_name: web_app_medicine
+    command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - search-api
+    volumes:
+      - .:/code/
+    ports:
+      - "8000:8000"
+    depends_on:
+     db_search:
+       condition: service_healthy
+
+networks:
+  search-api:
+    external: true

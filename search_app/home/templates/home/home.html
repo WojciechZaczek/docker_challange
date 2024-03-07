@@ -1,0 +1,21 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<h1>Hello {{ user.username}}</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <label for="pesel">Write pesel:</label>
+            <input type="text" id="pesel" name="pesel">
+            <button type="submit">Find</button>
+        </form>
+        {% if name and last_name %}
+            <h2>Clients Data:</h2>
+            <p>Name: {{ name }}</p>
+            <p>Last name: {{ last_name }}</p>
+            <p>PESEL: {{ pesel }}</p>
+        {% else %}
+            <p>{{ error_message }}</p>
+        {% endif %}
+
+{% endblock %}
+

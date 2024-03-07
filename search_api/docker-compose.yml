@@ -1,0 +1,38 @@
+version: '3.11'
+
+services:
+  db:
+    image: postgres
+    container_name: db_api
+    networks:
+      - search-api
+    environment:
+      - POSTGRES_DB=apidatabase
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+        - ./data/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+    restart: always
+
+  api_medicine:
+    build: .
+    networks:
+      - search-api
+
+    container_name: api_medicine
+    command: python manage.py runserver 0.0.0.0:8001
+    volumes:
+      - .:/code/
+    ports:
+      - "8001:8001"
+    depends_on:
+     db:
+       condition: service_healthy
+
+networks:
+  search-api:
